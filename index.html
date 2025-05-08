@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guess the Dessert's First Letter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/all.min.css">
+  <link rel="stylesheet" href="css/animate.min.css">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap');
+    body {
+      background-color: #2e2e2e;
+      font-family: "Caveat", cursive;
+      text-align: center;
+      color: #ffffff;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+    }
+
+    .rules-box {
+      background-color: #1d6a96;
+      padding: 15px 25px;
+      margin-bottom: 30px;
+      border-radius: 15px;
+      max-width: 600px;
+      animation: fadeInDown 1s ease-in-out;
+    }
+
+    img {
+      width: 300px;
+      margin: 20px 0;
+      border-radius: 20px;
+      transition: all 0.5s ease-in-out;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
+    img:hover {
+      opacity: 0.8;
+      transform: scale(1.25);
+      filter: brightness(1.1) saturate(1.2);
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 5px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      transition: all 0.3s ease-in-out;
+    }
+
+    button:hover {
+      background-color: #ffc107;
+      color: #000;
+      transform: scale(1.05);
+    }
+
+    .score {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+
+    #cryGif {
+      display: none;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+  <h2 class="text-warning wow animate__fadeInTopLeft" data-wow-duration="1s" data-wow-delay="0s" data-wow-iteration="1">Guess the first letter of this dessert</h2>
+
+  <div class="rules-box wow animate__fadeInDown" data-wow-duration="1s" data-wow-delay="0s">
+    <h3 class="text-info">🎮 Game Rules</h3>
+    <ul style="list-style: none; padding: 0; font-size: 18px; text-align: left;">
+      <li>🧁 You will see a dessert image.</li>
+      <li>🔤 Guess the <strong>first letter</strong> of its name.</li>
+      <li>✅ Correct: +10 points</li>
+      <li>❌ Wrong: -5 points (but never below 0)</li>
+      <li>🏆 Try to guess all of them!</li>
+    </ul>
+  </div>
+
+  <h3 id="questionNumber">Question 1</h3>
+  <img id="dessertImage" src="" alt="dessert">
+  <div>
+    <input id="letterInput" type="text" maxlength="1" placeholder="Enter a letter">
+    <button onclick="check()">Submit</button>
+  </div>
+
+  <div class="score">
+    <i class="text-success fa-solid fa-circle-check"></i> <span id="correctCount">0</span> |
+    <i class="text-warning animate__heartBeat fa-solid fa-medal" data-wow-duration="1s" data-wow-delay="0s" data-wow-iteration="1"></i>
+    <span id="score">0</span>
+  </div>
+
+  <div id="cryGif">
+    <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcGZveDN4M3VmMWRsM3Z1d2c0cWxneWtrbHV4a25oeHk5ZDNlM3MyciZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/OskZJhfJvjpldRpfar/giphy.gif" alt="crying" width="100">
+  </div>
+
+  <script>
+    const desserts = [
+      { name: "tiramisu", image: "https://media.istockphoto.com/id/517368976/photo/slice-of-dessert.webp?a=1&b=1&s=612x612&w=0&k=20&c=jnz3e9AETwq2F3EMtyASd6wR2-7-dIMyN5dXxCJ5Tu8=" },
+      { name: "waffle", image: "https://plus.unsplash.com/premium_photo-1664478254358-fb8ce668dca6?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8d2FmZmxlfGVufDB8fDB8fHww" },
+      { name: "matcha", image: "https://media.istockphoto.com/id/1408655409/photo/green-cake.webp?a=1&b=1&s=612x612&w=0&k=20&c=RLOdpXRHjfJUY5Nsk-PJLTIZDwSs8rzdspk51ij2ZZk=" }
+    ];
+
+    let current = 0;
+    let correct = 0;
+    let score = 0;
+
+    function showDessert() {
+      const item = desserts[current];
+      document.getElementById("dessertImage").src = item.image;
+      document.getElementById("questionNumber").innerText = `Question ${current + 1}`;
+      document.getElementById("letterInput").value = "";
+    }
+    
+    const c = confetti;
+    function aaa() {
+      c({
+        particleCount: 200,
+        spread: 90,
+        origin: { y: 0.6 }
+      });
+    }
+
+    function bbb() {
+      const gif = document.getElementById("cryGif");
+      gif.style.display = "block";
+      setTimeout(() => {
+        gif.style.display = "none";
+      }, 3000);
+    }
+
+    function check() {
+      const input = document.getElementById("letterInput").value.toLowerCase();
+      const answer = desserts[current].name[0];
+
+      if (input === answer) {
+        alert("Correct!");
+        correct++;
+        score += 10;
+      } else {
+        alert(`Wrong! The correct letter is '${answer}'`);
+        score = Math.max(0, score - 5);
+        bbb();
+      }
+
+      document.getElementById("correctCount").innerText = correct;
+      document.getElementById("score").innerText = score;
+
+      current++;
+
+      if (current >= desserts.length) {
+        if (correct === desserts.length) {
+          aaa();
+          setTimeout(() => {
+            alert("🎉 You guessed all correctly! You're a dessert master!");
+          }, 100);
+        }
+
+        current = 0;
+        correct = 0;
+        score = 0;
+
+        // 清空顯示分數與正確數量
+        document.getElementById("correctCount").innerText = "0"; 
+        document.getElementById("score").innerText = "0";
+        
+        // 隱藏分數和正確數量區塊
+        document.getElementById("cryGif").style.display = "none";  
+        document.getElementById("letterInput").value = ""; 
+
+        // 顯示第一題
+        showDessert();
+
+        // 隱藏分數區塊
+        document.getElementById("correctCount").style.display = "none"; 
+        document.getElementById("score").style.display = "none";
+
+        // 讓頁面看起來像遊戲剛開始
+        setTimeout(() => {
+          document.getElementById("correctCount").style.display = "inline";
+          document.getElementById("score").style.display = "inline";
+        }, 100);
+
+      } else {
+        showDessert();
+      }
+    }
+
+    showDessert();
+  </script>
+
+  <script src="js/bootstrap.bundle.min.js"></script>
+  <script src="js/jquery-3.7.1.min.js"></script>
+  <script src="js/wow.min.js"></script>
+  <script>
+    new WOW().init();
+  </script>
+</body>
+</html>
